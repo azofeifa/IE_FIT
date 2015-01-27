@@ -1,4 +1,4 @@
-#NU_FIT
+#PE_FIT
 ##python dependencies
 numpy, scipy, matplotlib
 ##module:
