@@ -1,9 +1,9 @@
 #PE_FIT
 ##python dependencies
 numpy, scipy, matplotlib
-##module:
+##module: convertAnnotation
 python NU_FIT/
-##module:
+##module: classify
 python NU_FIT/
-##module:
+##module: concatenate
 python NU_FIT/
