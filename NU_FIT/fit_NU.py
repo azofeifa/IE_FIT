@@ -17,9 +17,9 @@ def wrapper(h,clf,i):
 	X 	= [x-center for x in h.X]
 	H 		= clf.fit(X,weights=h.Y)
 	return H,i
-def run(H):
+def run(H,np=8):
 	
-	pool = mp.Pool(processes=8) 
+	pool = mp.Pool(processes=np) 
 	for t,i in enumerate(H.values()):
 		clf 	= model.NU(bic=True,rt=3,alpha=2,beta=500)
 		pool.apply_async(wrapper, args=( i,clf,t  ), callback=accumulateResults)

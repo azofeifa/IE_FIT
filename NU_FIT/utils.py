@@ -28,14 +28,51 @@ def makeGeneFormat(FILE, OUT,s, c, st, sp,n):#need to have position of strand, c
 	FHW.close()
 def userParameters(argv):
 	h 	= None
-	D 	= {}
+	D 	= {"-i":None, "-j": None, "-o": None, "-s":None, "-chr":None, "-t":False, "-single": True, "-v":False, "-np":None}
 	for a in argv:
 		if "-"==a[0]:
 			h 	= a
-			D[h] = list()
+			if h not in D:
+				print "user parameter: ",h, "is not allowed, please see README"
+				return None
+			if D[h] is None:
+				D[h] = list()
+			elif D[h] is False:
+				D[h] = True
 		elif h:
 			D[h].append(a)
 	return D
+
+def WELCOME(D):
+	print "=========================================================================================================="
+	print "                              Initiation and Elongation Mixture Model"
+	print "contact                    : joseph[dot]azofeifa[at]colorado[dot]edu"
+	print "input genome coverage file : " + str(D["-i"][0])
+	print "region/annotation file     : " + str(D["-j"][0])
+	print "output file                : " + str(D["-o"][0])
+	if D["-chr"]:
+		print "specific chromosome        : " + str(D["-chr"][0])
+	else:
+		print "specific chromosome        : " + "ALL (default)"
+	if D["-single"]:
+		print "single isoform/no overlaps : " + str(D["-single"])
+	else:
+		print "single isoform/no overlaps : " + "False (default)"
+	if D["-s"]:
+		print "strand                     : " + str(D["-s"][0] )
+	else:
+		print "strand                     : " + "assuming forward strand (default)"
+	if D["-np"]:
+		print "number of processors       : " + str(D["-np"][0])
+	else:
+		print "number of processors       : " + "8 (default)"
+		
+	print "=========================================================================================================="
+	
+
+
+
+
 			
 class info:
 	def __init__(self, start, stop, info=None):
@@ -140,6 +177,8 @@ class tree:
 	def searchInterval(self, interval):
 		assert self.root, "interval tree has not been built yet"
 		return self.root.searchInterval(interval)
+
+
 
 
 

@@ -1,5 +1,6 @@
 import math as m
 import numpy as np
+np.seterr(all="ignore")
 global no_plot
 try:
 	import matplotlib.pyplot as plt
@@ -155,7 +156,6 @@ class NU:
 			self.rvs 	= maxRVs
 			self.LL 	= maxLL
 			self.k 		= k
-			print self.k
 			self.converged = maxC
 			H 			= {"weights": [rv.w for rv in self.rvs],
 			"mu": [rv.mu for rv in self.rvs if hasattr(rv, "mu")],
