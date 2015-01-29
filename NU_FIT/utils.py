@@ -46,7 +46,7 @@ def userParameters(argv):
 def WELCOME(D):
 	print "=========================================================================================================="
 	print "                              Initiation and Elongation Mixture Model"
-	print "contact                    : joseph[dot]azofeifa[at]colorado[dot]edu"
+	print "contact                    : joseph[dot]azofeifa[at]gmail[dot]com"
 	print "input genome coverage file : " + str(D["-i"][0])
 	print "region/annotation file     : " + str(D["-j"][0])
 	print "output file                : " + str(D["-o"][0])
