@@ -20,11 +20,12 @@ def run(argv):
 		if D is None:
 			print "exiting..."
 			return False 
-		regionFile 	= D["-j"][0]
-		if regionFile is None or not os.path.isfile(regionFile):
+		regionFile 	= D["-j"]
+		if regionFile is None or not os.path.isfile(regionFile[0]):
 			print "(-j) not found or file does not exist."
 			print "exiting..."
 			return False
+		regionFile 	= regionFile[0]
 		if D["-s"]:
 			strand 		= D["-s"][0]
 		else:
@@ -32,16 +33,19 @@ def run(argv):
 		if strand is None:
 			print "warning, user did not specify strand assuming in forward strand in the IGV output file"
 			strand 	= "+"
-		BedGraphFile= D["-i"][0]
-		if BedGraphFile is None or not os.path.isfile(BedGraphFile):
+		BedGraphFile= D["-i"]
+		if BedGraphFile is None or not os.path.isfile(BedGraphFile[0]):
 			print "(-i) not found or file does not exist"
 			print "exiting..."
 			return False
-		OUT 		= D["-o"][0]
+		BedGraphFile= D["-i"][0]
+		
+		OUT 		= D["-o"]
 		if OUT is None:
 			print "(-o) please specify an OUT file name and path"
 			print "exiting"
 			return False
+		OUT 		= D["-o"][0]
 		if verbose:
 			utils.WELCOME(D)
 		if D["-chr"]:
