@@ -29,7 +29,8 @@ def makeGeneFormat(FILE, OUT,s, c, st, sp,n):#need to have position of strand, c
 def userParameters(argv):
 	h 	= None
 	D 	= {"-i":None, "-j": None, "-o": None, "-s":None, 
-	"-chr":None, "-t":False, "-single": True, "-v":False, "-np":None, "-BIC":None, "-rt":None}
+	"-chr":None, "-t":False, "-single": True, "-v":False, "-np":None, "-BIC":None, "-rt":None,
+	"-bin": None}
 	for a in argv:
 		if "-"==a[0]:
 			h 	= a
@@ -47,7 +48,7 @@ def userParameters(argv):
 def WELCOME(D):
 	print "=========================================================================================================="
 	print "                              Initiation and Elongation Mixture Model"
-	print "contact                      : joseph[dot]azofeifa[at]gmail[dot]com"
+	print "contact                      : joseph[dot]azofeifa[at]colorado[dot]edu"
 	print "input genome coverage file   : " + str(D["-i"][0])
 	print "region/annotation file       : " + str(D["-j"][0])
 	print "output file                  : " + str(D["-o"][0])
@@ -76,6 +77,11 @@ def WELCOME(D):
 		print "random number of seeds to EM : " + str(D["-rt"][0])
 	else:
 		print "random number of seeds to EM : 1 (default)" 
+	if D["-bin"] is not None:
+		print "binning data at              : " + str(D["-bin"][0])
+	else:
+		print "binning data at              : 200 (default)"  
+		
 		
 	print "=========================================================================================================="
 	

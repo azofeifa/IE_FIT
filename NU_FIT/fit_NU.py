@@ -17,14 +17,14 @@ def wrapper(h,clf,i):
 	X 	= [x-center for x in h.X]
 	H 		= clf.fit(X,weights=h.Y)
 	return H,i
-def run(H,np=8,maxBIC=None, penality=None,rt=3):
+def run(H,np=8,maxBIC=None, penality=None,rt=3,binSize=200):
 	
 	pool = mp.Pool(processes=np) 
 	for t,i in enumerate(H.values()):
 		if maxBIC:
-			clf 	= model.NU(bic=True,rt=rt,alpha=2,beta=500,BIC_PEN=penality, maxBIC=maxBIC)
+			clf 	= model.NU(bic=True,rt=rt,alpha=2,beta=500,BIC_PEN=penality, maxBIC=maxBIC,hist=binSize)
 		else:
-			clf 	= model.NU(bic=False,rt=rt,alpha=2,beta=500)
+			clf 	= model.NU(bic=False,rt=rt,alpha=2,beta=500,hist=binSize)
 			
 		pool.apply_async(wrapper, args=( i,clf,t  ), callback=accumulateResults)
 	pool.close()

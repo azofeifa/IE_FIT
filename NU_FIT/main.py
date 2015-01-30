@@ -1,4 +1,4 @@
-import utils,read, fit_NU,write, os,sys
+import utils,read, fit_NU,write, os,sys,time
 def run(argv):
 	H 		= {"convertAnnotation", "classify", "concatenate"}
 	assert len(argv) > 1, 'need to specify program parameters'
@@ -39,6 +39,7 @@ def run(argv):
 			return False
 		BedGraphFile= D["-i"][0]
 		maxBIC, penality 		= None, None
+		binSize 				= 200
 		rt 						= 1
 		if D["-BIC"] is not None:
 			if len(D["-BIC"])!= 2:
@@ -52,7 +53,7 @@ def run(argv):
 				print "-rt option found, but not the right number of parameters (int)"
 				print "exiting..."
 				return False
-			rt 	= int(D["-rt"])
+			rt 	= int(D["-rt"][0])
 		
 		OUT 		= D["-o"]
 		if OUT is None:
@@ -60,6 +61,12 @@ def run(argv):
 			print "exiting"
 			return False
 		OUT 		= D["-o"][0]
+		if D["-bin"] is not None:
+			if len(D["-bin"])!=1:
+				print "-bin option found, but not the right number of parameters (int)"
+				print "exiting"
+				return False
+			binSize = int(D["-bin"][0])
 		if verbose:
 			utils.WELCOME(D)
 		if D["-chr"]:
@@ -85,11 +92,15 @@ def run(argv):
 			print "finished"
 			sys.stdout.flush()
 			print "running mixture model        :",
-		H 			= fit_NU.run(H, np=np,maxBIC=maxBIC, penality=penality,rt=rt)
+		start 		= time.clock()
+		H 			= fit_NU.run(H, np=np,maxBIC=maxBIC, penality=penality,rt=rt,binSize=binSize)
 		if verbose:
 			print "finished"
 		D["-BIC"] 	= maxBIC, penality
 		D["-rt"] 	= rt
+		D["-chr"] 	= specChrom
+		D["-bin"] 	= binSize
+		D["-time"] 	= time.clock()-start
 		write.writeIGV(H, OUT,strand,D)
 	if module == "concatenate":
 		pass
