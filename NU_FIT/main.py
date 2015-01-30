@@ -16,7 +16,6 @@ def run(argv):
 	if module == "classify":
 		D 			= utils.userParameters(argv)
 		verbose 	= D["-v"]
-
 		if D is None:
 			print "exiting..."
 			return False 
@@ -39,6 +38,21 @@ def run(argv):
 			print "exiting..."
 			return False
 		BedGraphFile= D["-i"][0]
+		maxBIC, penality 		= None, None
+		rt 						= 1
+		if D["-BIC"] is not None:
+			if len(D["-BIC"])!= 2:
+				print "-BIC command found, but not the right number of parameters (int int)"
+				print "exiting..."
+				return False
+			maxBIC, penality 	= D["-BIC"]
+			maxBIC, penality 	= int(maxBIC), float(penality)
+		if D["-rt"] is not None:
+			if len(D["-rt"]!= 1):
+				print "-rt option found, but not the right number of parameters (int)"
+				print "exiting..."
+				return False
+			rt 	= int(D["-rt"])
 		
 		OUT 		= D["-o"]
 		if OUT is None:
@@ -58,22 +72,25 @@ def run(argv):
 			np 			= int(D["-np"][0])
 		else:
 			np 			= 8
+
 		if test:
 			print "...warning, running test"
 		regions 	= read.readIntervals(regionFile,single=single)#read in annotation intervals
 		if verbose:
 			sys.stdout.flush()
-			print "reading in BedGraphFile    :",
+			print "reading in BedGraphFile      :",
 			sys.stdout.flush()
 		H 			= read.insertBedGraphFile(BedGraphFile, regions, strand, test=test, spec=specChrom) #assert coverage data into each of the annotations
 		if verbose:
 			print "finished"
 			sys.stdout.flush()
-			print "running mixture model      :",
-		H 			= fit_NU.run(H, np=np)
+			print "running mixture model        :",
+		H 			= fit_NU.run(H, np=np,maxBIC=maxBIC, penality=penality,rt=rt)
 		if verbose:
 			print "finished"
-		write.writeIGV(H, OUT,strand)
+		D["-BIC"] 	= maxBIC, penality
+		D["-rt"] 	= rt
+		write.writeIGV(H, OUT,strand,D)
 	if module == "concatenate":
 		pass
 

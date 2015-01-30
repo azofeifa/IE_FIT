@@ -28,7 +28,8 @@ def makeGeneFormat(FILE, OUT,s, c, st, sp,n):#need to have position of strand, c
 	FHW.close()
 def userParameters(argv):
 	h 	= None
-	D 	= {"-i":None, "-j": None, "-o": None, "-s":None, "-chr":None, "-t":False, "-single": True, "-v":False, "-np":None}
+	D 	= {"-i":None, "-j": None, "-o": None, "-s":None, 
+	"-chr":None, "-t":False, "-single": True, "-v":False, "-np":None, "-BIC":None, "-rt":None}
 	for a in argv:
 		if "-"==a[0]:
 			h 	= a
@@ -46,26 +47,35 @@ def userParameters(argv):
 def WELCOME(D):
 	print "=========================================================================================================="
 	print "                              Initiation and Elongation Mixture Model"
-	print "contact                    : joseph[dot]azofeifa[at]gmail[dot]com"
-	print "input genome coverage file : " + str(D["-i"][0])
-	print "region/annotation file     : " + str(D["-j"][0])
-	print "output file                : " + str(D["-o"][0])
+	print "contact                      : joseph[dot]azofeifa[at]gmail[dot]com"
+	print "input genome coverage file   : " + str(D["-i"][0])
+	print "region/annotation file       : " + str(D["-j"][0])
+	print "output file                  : " + str(D["-o"][0])
 	if D["-chr"]:
-		print "specific chromosome        : " + str(D["-chr"][0])
+		print "specific chromosome          : " + str(D["-chr"][0])
 	else:
-		print "specific chromosome        : " + "ALL (default)"
+		print "specific chromosome          : " + "ALL (default)"
 	if D["-single"]:
-		print "single isoform/no overlaps : " + str(D["-single"])
+		print "single isoform/no overlaps   : " + str(D["-single"])
 	else:
-		print "single isoform/no overlaps : " + "False (default)"
+		print "single isoform/no overlaps   : " + "False (default)"
 	if D["-s"]:
-		print "strand                     : " + str(D["-s"][0] )
+		print "strand                       : " + str(D["-s"][0] )
 	else:
-		print "strand                     : " + "assuming forward strand (default)"
+		print "strand                       : " + "assuming forward strand (default)"
 	if D["-np"]:
-		print "number of processors       : " + str(D["-np"][0])
+		print "number of processors         : " + str(D["-np"][0])
 	else:
-		print "number of processors       : " + "8 (default)"
+		print "number of processors         : " + "8 (default)"
+	if D["-BIC"]:
+		print "max considered models by BIC : " + str(D["-BIC"][0])
+		print "BIC penality                 : " + str(D["-BIC"][1])
+	else:
+		print "number of fitted models      : 1 (default)"   
+	if D["-rt"]:
+		print "random number of seeds to EM : " + str(D["-rt"][0])
+	else:
+		print "random number of seeds to EM : 1 (default)" 
 		
 	print "=========================================================================================================="
 	

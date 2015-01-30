@@ -38,7 +38,7 @@ class normal:
 class NU:
 	def __init__(self, k=1, ct=0.001, 
 		mt=200, rt = 1, bic=False,
-		hist=200,m=0, kappa=0,alpha=-2,beta=0 ):
+		hist=200,m=0, kappa=0,alpha=-2,beta=0, BIC_PEN=10, maxBIC=3 ):
 		self.k			= k
 		self.rvs 		= None
 		self.ct 		= ct
@@ -46,12 +46,12 @@ class NU:
 		self.rt 		= rt
 		self.bic 		= bic
 		self.hist 		= hist
-		self.maxBIC 	= 3
+		self.maxBIC 	= maxBIC
 		self.rvs 		= None
 		self.LL 		= None
 		self._params 	= None
 		self.converged 	= False
-		self.BIC_PEN 	= 10
+		self.BIC_PEN 	= BIC_PEN
 		#priors, default cancel each other and give MLE solution
 		self.alphas 	= [1 for i in range(0, k*2)]
 		self.m 			= m #for mu
