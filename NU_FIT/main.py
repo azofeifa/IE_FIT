@@ -49,7 +49,7 @@ def run(argv):
 			maxBIC, penality 	= D["-BIC"]
 			maxBIC, penality 	= int(maxBIC), float(penality)
 		if D["-rt"] is not None:
-			if len(D["-rt"]!= 1):
+			if len(D["-rt"])!= 1:
 				print "-rt option found, but not the right number of parameters (int)"
 				print "exiting..."
 				return False
