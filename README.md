@@ -1,4 +1,4 @@
-#PE_FIT_1.1
+#IE_FIT_1.1
 ##python dependencies
 numpy, scipy, matplotlib
 ##module: convertAnnotation
