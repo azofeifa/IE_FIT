@@ -22,9 +22,9 @@ def run(H,np=8,maxBIC=None, penality=None,rt=3,binSize=200):
 	pool = mp.Pool(processes=np) 
 	for t,i in enumerate(H.values()):
 		if maxBIC:
-			clf 	= model.NU(bic=True,rt=rt,alpha=2,beta=500,BIC_PEN=penality, maxBIC=maxBIC,hist=binSize)
+			clf 	= model.NU(bic=True,rt=rt,alpha=1,beta=500,BIC_PEN=penality, maxBIC=maxBIC,hist=binSize)
 		else:
-			clf 	= model.NU(bic=False,rt=rt,alpha=2,beta=500,hist=binSize)
+			clf 	= model.NU(bic=False,rt=rt,alpha=1,beta=500,hist=binSize)
 			
 		pool.apply_async(wrapper, args=( i,clf,t  ), callback=accumulateResults)
 	pool.close()
