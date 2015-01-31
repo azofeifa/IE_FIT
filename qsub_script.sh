@@ -1,6 +1,8 @@
 #PBS -N IE_FIT
 #PBS -l nodes=1:ppn=64
 #PBS -t 1-20
+#PBS -e /Users/azofeifa/qsub_errors/
+#PBS -o /Users/azofeifa/qsub_stdo/
 module load numpy_1.8.1
 module load scipy_0.14.0 
 module load python_2.7.3
