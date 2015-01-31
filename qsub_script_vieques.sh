@@ -1,7 +1,11 @@
 #PBS -N IE_FIT
 #PBS -l nodes=1:ppn=32
+<<<<<<< HEAD
 #PBS -e /Users/azofeifa/qsub_errors/
 #PBS -o /Users/azofeifa/qsub_stdo/
+=======
+#PBS -t 1-100%10
+>>>>>>> 96370ee33a76e48691c035e4f75fa950a953a0ec
 module load numpy_1.6.1
 module load scipy_0.12.0
 module load python_2.7.3
@@ -18,8 +22,8 @@ chrom=chr1
 single=1
 test=0
 rt=5
-BIC_MAX=3
-BIC_PEN=25
+BIC_MAX=5
+BIC_PEN=$PBS_ARRAYID
 outFile=${chrom}_${BIC_MAX}_${BIC_PEN}_${rt}_IE_OUT.bed
 np=32
 if [ $test == "1" ]
