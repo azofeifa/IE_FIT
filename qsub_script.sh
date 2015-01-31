@@ -14,10 +14,10 @@ BG_FILE=DMSO2_3.sorted.fiveprime.pos.BedGraph
 annot_FILE=RefSeq.NU.tsv
 strand=+
 chrom=chr1
-single=0
+single=1
 test=0
-rt=3
-BIC_MAX=5
+rt=5
+BIC_MAX=3
 BIC_PEN=50
 outFile=${chrom}_${BIC_MAX}_${BIC_PEN}_${rt}_IE_OUT.bed
 np=64
@@ -29,7 +29,7 @@ else
     then
 	python $pathTosrc classify -i ${inFilePath}$BG_FILE -j ${inFilePath}$annot_FILE -o ${outFilePath}$outFile -s $strand -chr $chrom  -BIC $BIC_MAX $BIC_PEN -single -np $np -rt $rt
     else
-	python $pathTosrc classify -i ${inFilePath}$BG_FILE -j ${inFilePath}$annot_FILE -o ${outFilePath}$outFile -s $strand -chr $chrom  -BIC $BIC_MAX $BIC_PEN -np $np -rt $rt
+	python $pathTosrc classify -i ${inFilePath}$BG_FILE -j ${inFilePath}$annot_FILE -o ${outFilePath}$outFile -s $strand -chr $chrom  -BIC $BIC_MAX $BIC_PEN -np $np -rt $rt -merge
     fi
 fi
 
