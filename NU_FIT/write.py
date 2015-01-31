@@ -25,14 +25,14 @@ def writeIGV(H, OUT,strand,D):
 				if start is not None:
 					if prev.type == "normal":
 						ID 		= "initiation"
-						score 	= "500"
 						RGB 	= "255,0,0"
-						params 		= str(prev.mu+center) + "," + str(prev.sigma) + "," + str(prev.w)
+						score 	= str(prev.w)
+						params 		= str(prev.mu+center) + "," + str(prev.sigma) + "," + str(prev.w)+":"+I.name
 					else:
 						ID 		= "elongation"
 						RGB 	= "0,0,255"
-						params 		= str(prev.a+center) + "," + str(prev.b+center) + "," + str(prev.w)
-						
+						score 	= str(prev.w)
+						params 		= str(prev.a+center) + "," + str(prev.b+center) + "," + str(prev.w) + ":"+I.name
 					FHW.write(I.chrom+"\t" + str(I.X[start]) + "\t" + str(I.X[i]) + "\t" + ID + "\t" + 
 					str(score) + "\t" + strand+ "\t" + str(I.X[start]) + "\t" + str(I.X[i]) + "\t" + RGB + "\t" + params + "\n")
 				start 	= i
@@ -40,15 +40,19 @@ def writeIGV(H, OUT,strand,D):
 			prevI=i
 		if prev.type == "normal":
 			ID 		= "initiation"
-			score 	= "500"
+			score 	= str(prev.w)
 			RGB 	= "255,0,0"
-			params 		= str(prev.mu+center) + "," + str(prev.sigma) + "," + str(prev.w)
+			params 		= str(prev.mu+center) + "," + str(prev.sigma) + "," + str(prev.w)+ ":"+I.name
 		else:
 			ID 		= "elongation"
 			RGB 	= "0,0,255"
-			score 	= "100"
-			params 		= str(prev.a+center) + "," + str(prev.b+center) + "," + str(prev.w)
+			score 	= str(prev.w)
+			params 		= str(prev.a+center) + "," + str(prev.b+center) + "," + str(prev.w)+ ":"+I.name
 	
 		FHW.write(I.chrom+"\t" + str(I.X[start]) + "\t" + str(I.X[prevI]) + "\t" + ID + "\t" + 
 		str(score) + "\t" + strand+ "\t" + str(I.X[start]) + "\t" + str(I.X[prevI]) + "\t" + RGB + "\t" + params+ "\n")
+	
 	FHW.close()
+
+
+

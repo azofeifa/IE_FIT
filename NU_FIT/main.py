@@ -75,6 +75,11 @@ def run(argv):
 			specChrom 	= None
 		test 		= D["-t"]
 		single 		= D["-single"]
+		merge 		= D["-merge"]
+		if single and merge:
+			print "both -single and -merge options are found however they are mutually exclusive, choose one"
+			print "exiting..."
+			return False
 		if D["-np"]:
 			np 			= int(D["-np"][0])
 		else:
@@ -82,7 +87,7 @@ def run(argv):
 
 		if test:
 			print "...warning, running test"
-		regions 	= read.readIntervals(regionFile,single=single)#read in annotation intervals
+		regions 	= read.readIntervals(regionFile,single=single, merge=merge)#read in annotation intervals
 		if verbose:
 			sys.stdout.flush()
 			print "reading in BedGraphFile      :",

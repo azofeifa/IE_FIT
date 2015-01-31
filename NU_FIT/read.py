@@ -1,5 +1,5 @@
 import utils,time,isolate_overlaps
-def readIntervals(FILE,single=True):
+def readIntervals(FILE,single=False, merge=False):
 	FH 	= open(FILE)
 	D 	= {"+":{}, "-":{}}
 	for line in FH:
@@ -18,9 +18,10 @@ def readIntervals(FILE,single=True):
 			D[strand][chrom].sort()
 			if single:
 				D[strand][chrom] 	= utils.tree(isolate_overlaps.run(D[strand][chrom]))
+			elif merge:
+				D[strand][chrom] 	= utils.tree(isolate_overlaps.merge(D[strand][chrom]))
 			else:
-				D[strand][chrom] 	= utils.tree(isolate_overlaps.run(D[strand][chrom]))
-				
+				D[strand][chrom] 	= utils.tree(D[strand][chrom])
 	return D
 class interval:
 	def __init__(self, start, stop, name,chrom):
@@ -45,6 +46,8 @@ def insertBedGraphFile(bgFile, D,strand,test=False, spec=None):
 		if spec is None or chrom==spec:
 			start, stop, cov 		= int(start), int(stop), int(cov)
 			F 						= D[chrom].searchInterval((start, stop))
+			if F and len(F) > 1:
+				print "what?"
 			if (test and start > pow(10,7)) or (chrom != spec and spec is not None):
 				break
 			if F:

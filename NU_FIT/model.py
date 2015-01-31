@@ -12,6 +12,22 @@ def LOG(x):
 	if x > 0:
 		return m.log(x)
 	return -np.Inf
+def testRealData(FILE="/Users/joeyazo/Desktop/Lab/gro_seq/files/bed_files/DMSO2_3.sorted.fiveprime.pos.BedGraph",chrom="chr1",
+	start=84533886, stop=84704619):
+	FH 	= open(FILE)
+	X,Y =list(),list()
+	F 	= False
+	for line in FH:
+		c,st, sp, coverage 	= line.strip("\n").split("\t")
+		st, sp, coverage 	= int(st), int(sp), int(coverage)
+		if chrom == "chr1" and st > start and sp < stop:
+			F 	= True
+			X+=[st for i in range(st, sp)]
+			Y+=[coverage for i in range(st, sp)]
+		elif F:
+			break
+	FH.close()
+	return X,Y
 
 
 class uniform:
@@ -36,9 +52,9 @@ class normal:
 	def pdf(self, x):
 		return (self.w / (self.sigma*m.sqrt(2*m.pi)))*m.exp(-m.pow(x-self.mu,2)/(2*self.sigma**2))
 class NU:
-	def __init__(self, k=1, ct=0.001, 
-		mt=200, rt = 1, bic=False,
-		hist=200,m=0, kappa=0,alpha=-2,beta=0, BIC_PEN=10, maxBIC=3 ):
+	def __init__(self, k=1, ct=0.01, 
+		mt=20, rt = 1, bic=False,
+		hist=500,m=0, kappa=0,alpha=-2,beta=0, BIC_PEN=10, maxBIC=3, split =False ):
 		self.k			= k
 		self.rvs 		= None
 		self.ct 		= ct
@@ -52,8 +68,9 @@ class NU:
 		self._params 	= None
 		self.converged 	= False
 		self.BIC_PEN 	= BIC_PEN
+		self.split 		= split
 		#priors, default cancel each other and give MLE solution
-		self.alphas 	= [1 for i in range(0, k*2)]
+		self.alphas 	= [100 for i in range(0, k*2)]
 		self.m 			= m #for mu
 		self.kappa 		= kappa #for mu
 		self.alpha 		= alpha #for sigma
@@ -77,28 +94,24 @@ class NU:
 		#==============================
 		# random initialize
 		#==============================
-		
+		maxX 					= max(X)
 		#pick i's
-		IS 	= [np.random.uniform(min(X), max(X)) for i in range(0, K)]
+		IS 	= [np.random.uniform(min(X), maxX) for i in range(0, K)]
 		IS.sort()
 		#pick s's 
-		SS 	= [np.random.gamma(self.alpha, self.beta) for i in range(0, K)]
+		SS 	= [1000 for i in range(0, K)]
 		#pick w's 
 		initW	= 1.0 / (K*2)
 		rvs = [normal(IS[i],SS[i],w=initW) for i in range(0, K)]
-		rvs+= [uniform(IS[i], max(X),w=initW) for i in range(0, K)] 
 
+		rvs+= [uniform(IS[i], maxX,w=initW) for i in range(0, K)] 
 		w 	= np.zeros((X.shape[0],K*2))
-
+		prevLL 	= -np.Inf
 		while not converged and t< self.mt:
 			#compute weight
 			for k,rv in enumerate(rvs):
 				w[:,k] 	= map(lambda x: rv.pdf(x), X)
 			#compute likelihood
-			LL 		= sum([LOG(sum([rv.pdf(x) for rv in rvs]))*y for x,y in zip(X,Y)])
-			if abs(LL - prevLL) < self.ct:
-				return prevLL, rvs,True
-			prevLL 	= LL
 			#normalize weights
 			for i in range(0, w.shape[0]):
 				if sum(w[i,:]): #don't want to divide by zero
@@ -114,8 +127,39 @@ class NU:
 					rv.sigma= m.sqrt(( (w[:,k]*(X-rv.mu)**2).dot(Y) + 2*self.beta + self.kappa*pow(rv.mu-self.m,2))   / ((sum(w[:,k]*Y)) + self.alpha + 2))
 					if rv.sigma < 0.0001: #one of the components blew up ):
 						return -np.Inf, rvs,False
+			
+
+			LL 		= sum([LOG(sum([rv.pdf(x) for rv in rvs]))*y for x,y in zip(X,Y)])
+			if self.split:
+				# #pick new Ls, run accross data pick best split based on max loglikelihood
+				uniforms 	= [rv for rv in rvs if rv.type == "uniform"]
+				prevBs 		= [rv.b for rv in rvs if rv.type == "uniform"]
+				maxUniL 	= LL
+				argU 		= None
+				for u in uniforms:
+					for l in np.linspace(u.a, maxX, 20):
+						u.b 	= l
+						ull 	= sum([LOG(sum([rv.pdf(x) for rv in rvs]))*y for x,y in zip(X,Y)])
+						if ull > maxUniL:
+							maxUniL = ull
+							argU 	= [rv.b for rv in rvs if rv.type == "uniform"]
+				if argU:
+					for i, argl in enumerate(argU):
+						uniforms[i].b 	= argl
+					LL 			= maxUniL
+				else:
+					for i, b in enumerate(prevBs):
+						uniforms[i].b 	= b
+				if abs(LL - prevLL) < self.ct:
+					print "converged"
+			
+					return prevLL, rvs,True
+			prevLL 	= LL	
 			t+=1
 		return prevLL, rvs,converged
+		
+
+
 	
 	def fit(self, X, weights = None):
 		if self.hist is not None:
@@ -174,8 +218,6 @@ class NU:
 			plt.show()
 
 
-
-
 	def predict(self, x):
 		P 		= np.array([rv.pdf(x) for rv in self.rvs])
 		P 		/= sum(P) 
@@ -183,19 +225,6 @@ class NU:
 		
 	def _func(self, x):
 		return sum([rv.pdf(x) for rv in self.rvs])
-
-if __name__ == "__main__":
-	#test bayesian priors
-	#simulate
-	D 		= [x for x in np.random.normal(10,1,100)]+ [x for x in np.random.uniform(10,100,100)]
-	clf 	= NU(alpha=2,beta=2, m=0, kappa=0.01,bic=True)
-	clf.fit(D)
-	plt.hist(D, bins=100, normed=1)
-	xs 	= np.linspace(min(D), max(D), 1000)
-	plt.plot(xs, [clf._func(x) for x in xs], linewidth=4., linestyle="--")
-	plt.show()
-
-
 
 
 

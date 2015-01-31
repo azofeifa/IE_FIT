@@ -29,8 +29,8 @@ def makeGeneFormat(FILE, OUT,s, c, st, sp,n):#need to have position of strand, c
 def userParameters(argv):
 	h 	= None
 	D 	= {"-i":None, "-j": None, "-o": None, "-s":None, 
-	"-chr":None, "-t":False, "-single": True, "-v":False, "-np":None, "-BIC":None, "-rt":None,
-	"-bin": None}
+	"-chr":None, "-t":False, "-single": False, "-v":False, "-np":None, "-BIC":None, "-rt":None,
+	"-bin": None, "-merge": False}
 	for a in argv:
 		if "-"==a[0]:
 			h 	= a
@@ -56,10 +56,6 @@ def WELCOME(D):
 		print "specific chromosome          : " + str(D["-chr"][0])
 	else:
 		print "specific chromosome          : " + "ALL (default)"
-	if D["-single"]:
-		print "single isoform/no overlaps   : " + str(D["-single"])
-	else:
-		print "single isoform/no overlaps   : " + "False (default)"
 	if D["-s"]:
 		print "strand                       : " + str(D["-s"][0] )
 	else:
@@ -81,8 +77,14 @@ def WELCOME(D):
 		print "binning data at              : " + str(D["-bin"][0])
 	else:
 		print "binning data at              : 200 (default)"  
-		
-		
+	if D["-single"]:
+		print "single isoform/no overlaps   : enabled"  
+	else:
+		print "single isoform/no overlaps   : disabled (default)" 
+	if D["-merge"] is not None:
+		print "merge isoforms               : enabled"
+	else:
+		print "merge isoforms               : disabled (default)"
 	print "=========================================================================================================="
 	
 
@@ -150,7 +152,7 @@ class treeNode:
 			return self.node.search(interval)
 		if stop < self.node.start and self.left:
 			return self.left.searchInterval(interval)
-		if start > self.node.stop and self .right:
+		if start > self.node.stop and self.right:
 			return self.right.searchInterval(interval)
 		return None
 
@@ -170,14 +172,15 @@ class tree:
 			i 	= 0
 			N 	= len(LST)
 			o_st,o_sp 	= LST[i][0],LST[i][1]
-			while i < N and (LST[i][0] <= o_sp and LST[i][1]>= o_st) : #want to find where there are no overlaps split on that
+			while i < N and (LST[i][0] <= o_sp) : #want to find where there are no overlaps split on that
 				o_st, o_sp 	= min((o_st, LST[i][0])),max((o_sp, LST[i][1]))
 				i+=1
 			left, right 	=  LST[:i], LST[i:]
+
 			x,y 			= [info[0] for info in left],[info[1] for info in left]
 			NODE 			= node(min(x), max(y))
 			NODE.intervals 	= left	
-			NODE.checkIntervals()	
+			#NODE.checkIntervals()	
 
 			nodes.append(NODE)
 			LST 			= right
