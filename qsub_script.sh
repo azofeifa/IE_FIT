@@ -1,6 +1,6 @@
 #PBS -N IE_FIT
 #PBS -l nodes=1:ppn=64
-#PBS -t 1-20
+#PBS -t 1-500%50
 #PBS -e /Users/azofeifa/qsub_errors/
 #PBS -o /Users/azofeifa/qsub_stdo/
 module load numpy_1.8.1
@@ -21,7 +21,8 @@ test=0
 rt=5
 BIC_MAX=5
 BIC_PEN=$PBS_ARRAYID
-outFile=${chrom}_${BIC_MAX}_${BIC_PEN}_${rt}_IE_OUT.bed
+BINS=1000
+outFile=${chrom}_${BIC_MAX}_${BIC_PEN}_${rt}_${BINS}_IE_OUT.bed
 np=64
 if [ $test == "1" ]
 then
@@ -29,7 +30,7 @@ then
 else
     if [ $single == "1" ]
     then
-	python $pathTosrc classify -i ${inFilePath}$BG_FILE -j ${inFilePath}$annot_FILE -o ${outFilePath}$outFile -s $strand -chr $chrom  -BIC $BIC_MAX $BIC_PEN -single -np $np -rt $rt
+	python $pathTosrc classify -i ${inFilePath}$BG_FILE -j ${inFilePath}$annot_FILE -o ${outFilePath}$outFile -s $strand -chr $chrom  -BIC $BIC_MAX $BIC_PEN -single -np $np -rt $rt -bin $BINS -v
     else
 	python $pathTosrc classify -i ${inFilePath}$BG_FILE -j ${inFilePath}$annot_FILE -o ${outFilePath}$outFile -s $strand -chr $chrom  -BIC $BIC_MAX $BIC_PEN -np $np -rt $rt -merge
     fi
