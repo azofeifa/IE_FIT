@@ -25,13 +25,13 @@ $python NU_FIT/ classify -i \<genomeCoverageFile.bedgraph> -j \<annotationFormat
 
 -chr: \<string> (optional) you can specify a specific chromosome to run on, this string (i.e. chr1, chr2 ... ) must actually be in the genome coverage file and annotation file, default runs against all
 
--single: this will only take annotations in the annotation file that do not overlap another gene, i.e. single isoform genes, default behavior is off.
+-single: \<None> (optional) this will only take annotations in the annotation file that do not overlap another gene, i.e. single isoform genes, default behavior is off.
 
--np: \<int> number of processors, default is 8
+-np: \<int> (optional) number of processors, default is 8
 
--BIC:\<int int>, first number specifies the max number of mixture models to run on each gene and the second int specifies the BIC criteria penality for increasing model selection. default is disabled and will run only one mixture model. 
+-BIC:\<int int>, (optional, but recommended) first number specifies the max number of mixture models to run on each gene and the second int specifies the BIC criteria penality for increasing model selection. default is disabled and will run only one mixture model. 
 
--rt: \<int>, number of random iterations per each model fit, default is 1. 
+-rt: \<int>, (optional) number of random iterations per each model fit, default is 1. 
 
 
 ##module: concatenate

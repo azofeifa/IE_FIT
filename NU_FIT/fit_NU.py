@@ -12,21 +12,23 @@ except:
 def accumulateResults(result):
 	LST.append(result)
 
-def wrapper(h,clf,i):
+def wrapper(h,clf,i,rev):
 	center 	= min(h.X)
-	X 	= [x-center for x in h.X]
-	H 		= clf.fit(X,weights=h.Y)
-	return H,i
-def run(H,np=8,maxBIC=None, penality=None,rt=3,binSize=200):
+	X 		= [x-center for x in h.X]
+	Y 		= h.Y
+	H 		= clf.fit(X,weights=Y,rev=rev)
 	
+	return H,i
+def run(H,np=8,maxBIC=None, penality=None,rt=3,binSize=200,strand = ""):
+	assert strand, "must specify strand...this should never evalaute to false..."
 	pool = mp.Pool(processes=np) 
 	for t,i in enumerate(H.values()):
 		if maxBIC:
-			clf 	= model.NU(bic=True,rt=rt,alpha=1,beta=500,BIC_PEN=penality, maxBIC=maxBIC,hist=binSize)
+			clf 	= model.NU(bic=True,rt=rt,alpha=1,beta=200,BIC_PEN=penality, maxBIC=maxBIC,hist=binSize)
 		else:
-			clf 	= model.NU(bic=False,rt=rt,alpha=1,beta=500,hist=binSize)
-			
-		pool.apply_async(wrapper, args=( i,clf,t  ), callback=accumulateResults)
+			clf 	= model.NU(bic=False,rt=rt,alpha=1,beta=200,hist=binSize)
+	
+		pool.apply_async(wrapper, args=( i,clf,t,strand=="-"  ), callback=accumulateResults)
 	pool.close()
 	pool.join()
 

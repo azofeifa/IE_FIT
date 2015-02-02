@@ -81,7 +81,7 @@ class NU:
 
 
 
-	def _estimate(self, X, Y,K):
+	def _estimate(self, X, Y,K,rev=False):
 		if K == 0: #assume just a uniform distribution
 			a,b 	= min(X), max(X)
 			ll 		= sum([LOG(1. / (b-a))*y for y in Y if y])
@@ -95,6 +95,7 @@ class NU:
 		# random initialize
 		#==============================
 		maxX 					= max(X)
+		minX 					= min(X)
 		#pick i's
 		IS 	= [np.random.uniform(min(X), maxX) for i in range(0, K)]
 		IS.sort()
@@ -103,8 +104,10 @@ class NU:
 		#pick w's 
 		initW	= 1.0 / (K*2)
 		rvs = [normal(IS[i],SS[i],w=initW) for i in range(0, K)]
-
-		rvs+= [uniform(IS[i], maxX,w=initW) for i in range(0, K)] 
+		if rev:
+			rvs+= [uniform(minX, IS[i],w=initW) for i in range(0, K)] 	
+		else:
+			rvs+= [uniform(IS[i], maxX,w=initW) for i in range(0, K)] 
 		w 	= np.zeros((X.shape[0],K*2))
 		prevLL 	= -np.Inf
 		while not converged and t< self.mt:
@@ -161,7 +164,7 @@ class NU:
 
 
 	
-	def fit(self, X, weights = None):
+	def fit(self, X, weights = None,rev=False):
 		if self.hist is not None:
 			counts,edges 	= np.histogram(X, bins=self.hist,weights=weights)
 			X 				= edges[1:]
@@ -174,7 +177,7 @@ class NU:
 				k 							= self.k
 				maxLL, maxRVs,maxC 	= -np.Inf, None,False
 				for t in range(0, self.rt):
-					LL, rvs,converged 	= self._estimate(X, Y, k)
+					LL, rvs,converged 	= self._estimate(X, Y, k,rev=rev)
 
 					if maxLL < LL or maxLL == -np.Inf:
 						maxLL 	= LL
@@ -186,7 +189,7 @@ class NU:
 				for k in range(0, self.maxBIC):
 					maxLL, maxRVs,maxC 	= -np.Inf, None,False
 					for t in range(0, self.rt):
-						LL, rvs,converged 	= self._estimate(X, Y, k)
+						LL, rvs,converged 	= self._estimate(X, Y, k,rev=rev)
 						if maxLL < LL or maxRVs is None:
 							maxLL 	= LL
 							maxRVs 	= rvs 

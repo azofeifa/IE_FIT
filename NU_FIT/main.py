@@ -15,20 +15,28 @@ def run(argv):
 		utils.makeGeneFormat(annotFile, out,int(s), int(c), int(st), int(sp),int(n))
 	if module == "classify":
 		D 			= utils.userParameters(argv)
-		verbose 	= D["-v"]
 		if D is None:
 			print "exiting..."
 			return False 
+		
+		verbose 	= D["-v"]
 		regionFile 	= D["-j"]
 		if regionFile is None or not os.path.isfile(regionFile[0]):
 			print "(-j) not found or file does not exist."
 			print "exiting..."
 			return False
 		regionFile 	= regionFile[0]
-		if D["-s"]:
-			strand 		= D["-s"][0]
+		if D["-s"] is not None:
+			if len(D["-s"]) != 1:
+				print "-s command found but not the right number of parameters (int)"
+				print "exiting..."
+				return False
+			else:
+				strand 		= D["-s"][0]
 		else:
-			strand 		= "+"
+			print "-s command not found, please specify strand"
+			print "exiting..."
+			return False
 		if strand is None:
 			print "warning, user did not specify strand assuming in forward strand in the IGV output file"
 			strand 	= "+"
@@ -37,10 +45,17 @@ def run(argv):
 			print "(-i) not found or file does not exist"
 			print "exiting..."
 			return False
-		BedGraphFile= D["-i"][0]
+		BedGraphFile 			= D["-i"][0]
 		maxBIC, penality 		= None, None
 		binSize 				= 200
 		rt 						= 1
+		interval 				= None
+		if D["-int"] is not None:
+			if len(D["-int"]) != 1:
+				print "-int command found, but not the right number of parameters (int)"
+				print "exiting"
+				return False
+			interval 	= int(D["-int"][0])
 		if D["-BIC"] is not None:
 			if len(D["-BIC"])!= 2:
 				print "-BIC command found, but not the right number of parameters (int int)"
@@ -87,7 +102,7 @@ def run(argv):
 
 		if test:
 			print "...warning, running test"
-		regions 	= read.readIntervals(regionFile,single=single, merge=merge)#read in annotation intervals
+		regions 	= read.readIntervals(regionFile,single=single, merge=merge, interval=interval)#read in annotation intervals
 		if verbose:
 			sys.stdout.flush()
 			print "reading in BedGraphFile      :",
@@ -98,7 +113,7 @@ def run(argv):
 			sys.stdout.flush()
 			print "running mixture model        :",
 		start 		= time.clock()
-		H 			= fit_NU.run(H, np=np,maxBIC=maxBIC, penality=penality,rt=rt,binSize=binSize)
+		H 			= fit_NU.run(H, np=np,maxBIC=maxBIC, penality=penality,rt=rt,binSize=binSize,strand=strand)
 		if verbose:
 			print "finished"
 		D["-BIC"] 	= maxBIC, penality
@@ -108,7 +123,43 @@ def run(argv):
 		D["-time"] 	= time.clock()-start
 		write.writeIGV(H, OUT,strand,D)
 	if module == "concatenate":
-		pass
+		D 			= utils.userParameters(argv)
+		DIR,OUT 	= None, None
+		if D is None:
+			print "(-i) and (-j) commands not found... "
+			print "exiting..."
+			return False 
+		if D["-i"] is None:
+			print "-i command not found, need to specify an input directory (path)"
+			print "exiting"
+			return False
+		else:
+			if len(D["-i"]) != 1:
+				print "-i command found but not the write number of parameters..."
+				print "exiting..."
+				return False
+			else:
+				DIR=D["-i"[0]]
+		if D["-j"] is None:
+			print "-j command not found, need to specify an output file name (path)"
+			print "exiting"
+			return False
+		else:
+			if len(D["-j"]) != 1:
+				print "-j command found but not the write number of parameters..."
+				print "exiting..."
+				return False
+			else:
+				OUT=D["-j"[0]]
+		read.readDirIE_OUT(DIR, OUT)
+
+
+
+
+
+
+
+		
 
 
 

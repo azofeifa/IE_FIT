@@ -33,6 +33,16 @@ $python NU_FIT/ classify -i \<genomeCoverageFile.bedgraph> -j \<annotationFormat
 
 -rt: \<int>, (optional) number of random iterations per each model fit, default is 1. 
 
+-bin: \<int>, (optional) read coverage across annotation will be binned according to this resolution, default is 1000, higher the better
+
+-merge: \<int>, (optional) this will take overlapping isoforms and take the min start and max stop of the isoforms as one single annotation
+
+-int: \<int>, (optional) this takes values 0-20, if 0 then the first 5% of annotations will be calculated...this is useful for node parrellization i.e. job array in torque/qsub scripting
 
 ##module: concatenate
-$python NU_FIT/ concatenate
+$python NU_FIT/ concatenate -i \<path/to/directory/of/IE_OUT files> -j \<path/to/out_file_name>
+
+-i: \<path/to/> whatever the directory of IE_OUT files that you want to pull together and make into a single bed file
+
+-j: \<path/to/> whatever you want to call the out file name, remember to append ".bed" to outfile name to load into IGV or UCSC genome browser
+

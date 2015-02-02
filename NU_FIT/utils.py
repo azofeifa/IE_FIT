@@ -30,9 +30,9 @@ def userParameters(argv):
 	h 	= None
 	D 	= {"-i":None, "-j": None, "-o": None, "-s":None, 
 	"-chr":None, "-t":False, "-single": False, "-v":False, "-np":None, "-BIC":None, "-rt":None,
-	"-bin": None, "-merge": False}
+	"-bin": None, "-merge": False, "-int":None}
 	for a in argv:
-		if "-"==a[0]:
+		if "-"==a[0] and len(a) > 1:
 			h 	= a
 			if h not in D:
 				print "user parameter: ",h, "is not allowed, please see README"

@@ -1,8 +1,10 @@
-import utils,time,isolate_overlaps
-def readIntervals(FILE,single=False, merge=False):
-	FH 	= open(FILE)
-	D 	= {"+":{}, "-":{}}
-	for line in FH:
+import utils,time,isolate_overlaps,os
+def readIntervals(FILE,single=False, merge=False, interval=None):
+	FH 		= open(FILE)
+	D 		= {"+":{}, "-":{}}
+	lines	= FH.readlines()
+	
+	for i,line in enumerate(lines):
 		lineArray 	= line.strip("\n").split("\t")
 		assert len(lineArray)==5, "strand\tchrom\tstart\t\stop\tname(ID)\n format please..."
 		strand, chrom,start, stop,name 	= lineArray
@@ -11,11 +13,16 @@ def readIntervals(FILE,single=False, merge=False):
 		if chrom not in D[strand]:
 			D[strand][chrom] 		= list()
 		D[strand][chrom].append((int(start), int(stop), name))
-	FH.close()
+
 	#sort
 	for strand in D:
 		for chrom in D[strand]:
+			N 						= len(D[strand][chrom])
+			size 					= N /20.
 			D[strand][chrom].sort()
+			if interval is not None:
+				start, stop 			= size*interval,size*(interval+1)
+				D[strand][chrom] 		= [d for i,d in enumerate(D[strand][chrom]) if start<=i<=stop]
 			if single:
 				D[strand][chrom] 	= utils.tree(isolate_overlaps.run(D[strand][chrom]))
 			elif merge:
@@ -46,8 +53,6 @@ def insertBedGraphFile(bgFile, D,strand,test=False, spec=None):
 		if spec is None or chrom==spec:
 			start, stop, cov 		= int(start), int(stop), int(cov)
 			F 						= D[chrom].searchInterval((start, stop))
-			if F and len(F) > 1:
-				print "what?"
 			if (test and start > pow(10,7)) or (chrom != spec and spec is not None):
 				break
 			if F:
@@ -58,6 +63,31 @@ def insertBedGraphFile(bgFile, D,strand,test=False, spec=None):
 					H[name].Y+=[cov for i in range(start, stop)]
 	FH.close()
 	return H
+
+def readDirIE_OUT(DIR, out):
+	FHW 	= open(out, "w")
+	for f in os.listdir(DIR):
+		FH 	= open(DIR+f)
+		for line in FH:
+			FHW.write(line)
+		FH.close()
+	FHW.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
