@@ -18,7 +18,7 @@ def readIntervals(FILE,single=False, merge=False, interval=None):
 	for strand in D:
 		for chrom in D[strand]:
 			N 						= len(D[strand][chrom])
-			size 					= N /20.
+			size 					= N /50.
 			D[strand][chrom].sort()
 			if interval is not None:
 				start, stop 			= size*interval,size*(interval+1)

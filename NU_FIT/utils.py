@@ -81,7 +81,7 @@ def WELCOME(D):
 		print "single isoform/no overlaps   : enabled"  
 	else:
 		print "single isoform/no overlaps   : disabled (default)" 
-	if D["-merge"] is not None:
+	if D["-merge"]:
 		print "merge isoforms               : enabled"
 	else:
 		print "merge isoforms               : disabled (default)"
