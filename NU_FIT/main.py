@@ -102,7 +102,10 @@ def run(argv):
 
 		if test:
 			print "...warning, running test"
-		regions 	= read.readIntervals(regionFile,single=single, merge=merge, interval=interval)#read in annotation intervals
+		regions 	= read.readIntervals(regionFile,strand, single=single, merge=merge, interval=interval)#read in annotation intervals
+		if regions is None:
+			print "exiting..."
+			return False
 		if verbose:
 			sys.stdout.flush()
 			print "reading in BedGraphFile      :",
