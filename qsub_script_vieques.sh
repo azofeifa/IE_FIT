@@ -2,7 +2,7 @@
 #PBS -l nodes=1:ppn=32
 #PBS -e /Users/azofeifa/qsub_errors/
 #PBS -o /Users/azofeifa/qsub_stdo/
-#PBS -t 1-500%20
+#PBS -t 0-20
 module load numpy_1.6.1
 module load scipy_0.12.0
 module load python_2.7.3
@@ -20,10 +20,12 @@ single=1
 test=0
 rt=10
 BIC_MAX=10
-BIC_PEN=$PBS_ARRAYID
-BIN=500
-outFile=${chrom}_${BIC_MAX}_${BIC_PEN}_${rt}_${BIN}_IE_OUT.bed
+BIC_PEN=15
+BIN=10000
+int=$PBS_ARRAYID
+outFile=${chrom}_${BIC_MAX}_${BIC_PEN}_${rt}_${BIN}_${strand}_${int}_IE_OUT.bed
 np=32
+
 if [ $test == "1" ]
 then
     python $pathTosrc classify -i ${inFilePath}$BG_FILE -j ${inFilePath}$annot_FILE -o ${outFilePath}$outFile -s $strand -chr $chrom -v -BIC $BIC_MAX $BIC_PEN -np $np -t
