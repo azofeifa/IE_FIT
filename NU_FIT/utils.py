@@ -30,7 +30,7 @@ def userParameters(argv):
 	h 	= None
 	D 	= {"-i":None, "-j": None, "-o": None, "-s":None, 
 	"-chr":None, "-t":False, "-single": False, "-v":False, "-np":None, "-BIC":None, "-rt":None,
-	"-bin": None, "-merge": False, "-int":None}
+	"-bin": None, "-merge": False, "-int":None, "-pad":None}
 	for a in argv:
 		if "-"==a[0] and len(a) > 1:
 			h 	= a
@@ -172,6 +172,7 @@ class tree:
 			i 	= 0
 			N 	= len(LST)
 			o_st,o_sp 	= LST[i][0],LST[i][1]
+			
 			while i < N and (LST[i][0] <= o_sp) : #want to find where there are no overlaps split on that
 				o_st, o_sp 	= min((o_st, LST[i][0])),max((o_sp, LST[i][1]))
 				i+=1

@@ -6,9 +6,39 @@ def run(argv):
 	assert module in H, 'need to specify either convertAnnotation or classify'
 	if module == "convertAnnotation":
 		D 			= utils.userParameters(argv)
-		annotFile 	= D["-i"][0]
-		s,c,st,sp,n = D["-j"]
-		out 		= D["-o"][0]		
+		if D is None:
+			print "no command options found"
+			print "exiting..."
+			return False 
+		if D["-i"] is None:
+			print "(-i) command not found"
+			print "exiting..."
+			return False
+		elif len(D["-i"])!=1:
+			print "-i command found but not right number of parameters, <path>"
+			print "exiting..."
+		else:
+
+			annotFile 	= D["-i"][0]
+		if D["-j"] is None:
+			print "(-j) command not found"
+			print "exiting..."
+			return False
+		elif len(D["-j"])!=5:
+			print "-j command found but not right number of parameters, (int,int,int,int,int)"
+			print "exiting..."
+		else:
+			s,c,st,sp,n = D["-j"]
+		if D["-o"] is None:
+			print "(-o) command not found"
+			print "exiting..."
+			return False
+		elif len(D["-o"])!=1:
+			print "-o command found but not right number of parameters, <path>"
+			print "exiting..."
+		else:
+		
+			out 		= D["-o"][0]		
 		verbose 	= D["-v"]
 
 
@@ -18,7 +48,7 @@ def run(argv):
 		if D is None:
 			print "exiting..."
 			return False 
-		
+		pad 		= (0,0)
 		verbose 	= D["-v"]
 		regionFile 	= D["-j"]
 		if regionFile is None or not os.path.isfile(regionFile[0]):
@@ -37,6 +67,13 @@ def run(argv):
 			print "-s command not found, please specify strand"
 			print "exiting..."
 			return False
+		if D["-pad"] is not None:
+			if len(D["-pad"]) != 2:
+				print "-pad command found but no the right number of parameters (int,int)"
+				print "exiting..."
+				return False
+			else:
+				pad 	= int(D["-pad"][0]),int(D["-pad"][1])
 		if strand is None:
 			print "warning, user did not specify strand assuming in forward strand in the IGV output file"
 			strand 	= "+"
@@ -102,7 +139,7 @@ def run(argv):
 
 		if test:
 			print "...warning, running test"
-		regions 	= read.readIntervals(regionFile,strand, single=single, merge=merge, interval=interval)#read in annotation intervals
+		regions 	= read.readIntervals(regionFile,strand, single=single, merge=merge, interval=interval,pad=pad)#read in annotation intervals
 		if regions is None:
 			print "exiting..."
 			return False

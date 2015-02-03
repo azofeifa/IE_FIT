@@ -1,9 +1,9 @@
 import utils,time,isolate_overlaps,os
-def readIntervals(FILE,STRAND, single=False, merge=False, interval=None):
+def readIntervals(FILE,STRAND, single=False, merge=False, interval=None,pad=(0,0)):
 	FH 		= open(FILE)
 	D 		= {"+":{}, "-":{}}
 	lines	= FH.readlines()
-	
+
 	for i,line in enumerate(lines):
 		lineArray 	= line.strip("\n").split("\t")
 		assert len(lineArray)==5, "strand\tchrom\tstart\t\stop\tname(ID)\n format please..."
@@ -24,11 +24,17 @@ def readIntervals(FILE,STRAND, single=False, merge=False, interval=None):
 				start, stop 			= size*interval,size*(interval+1)
 				D[strand][chrom] 		= [d for i,d in enumerate(D[strand][chrom]) if start<=i<=stop]
 			if single:
-				D[strand][chrom] 	= utils.tree(isolate_overlaps.run(D[strand][chrom]))
+				D[strand][chrom] 	= isolate_overlaps.run(D[strand][chrom])
 			elif merge:
-				D[strand][chrom] 	= utils.tree(isolate_overlaps.merge(D[strand][chrom]))
+				D[strand][chrom] 	= isolate_overlaps.merge(D[strand][chrom])
 			else:
-				D[strand][chrom] 	= utils.tree(D[strand][chrom])
+				D[strand][chrom] 	= D[strand][chrom]
+			if STRAND=="-":
+				D[strand][chrom] 		= [(start-pad[1], stop+pad[0], name) for start, stop, name in D[strand][chrom]]
+			else:
+				D[strand][chrom] 		= [(start-pad[0], stop+pad[1], name) for start, stop, name in D[strand][chrom] ]
+			D[strand][chrom] 			= utils.tree(D[strand][chrom])
+				
 		if STRAND not in D:
 			print "user specified strand is not present in annotation file"
 			D 	= None 
