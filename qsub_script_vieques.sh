@@ -3,6 +3,7 @@
 #PBS -e /Users/azofeifa/qsub_errors/
 #PBS -o /Users/azofeifa/qsub_stdo/
 #PBS -t 0-50
+#PBS -l walltime=05:00:00
 module load numpy_1.6.1
 module load scipy_0.12.0
 module load python_2.7.3
@@ -13,15 +14,15 @@ inFilePath=${root}inFiles_IE_FIT/
 pathTosrc=${root}IE_FIT/NU_FIT/
 
 BG_FILE=DMSO2_3.sorted.fiveprime.pos.BedGraph
-annot_FILE=FStitch_neg_Annotations.tsv
-strand=-
+annot_FILE=FStitch_pos_Annotations.tsv
+strand=+
 chrom=chr1
 single=0
 test=0
 rt=10
 BIC_MAX=10
 BIC_PEN=15
-BIN=10000
+BIN=1000
 int=$PBS_ARRAYID
 outFile=${chrom}_${BIC_MAX}_${BIC_PEN}_${rt}_${BIN}_${strand}_${int}_IE_OUT.bed
 np=32

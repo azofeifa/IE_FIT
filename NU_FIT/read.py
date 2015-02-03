@@ -1,5 +1,5 @@
 import utils,time,isolate_overlaps,os
-def readIntervals(FILE,single=False, merge=False, interval=None):
+def readIntervals(FILE,STRAND, single=False, merge=False, interval=None):
 	FH 		= open(FILE)
 	D 		= {"+":{}, "-":{}}
 	lines	= FH.readlines()
@@ -29,6 +29,9 @@ def readIntervals(FILE,single=False, merge=False, interval=None):
 				D[strand][chrom] 	= utils.tree(isolate_overlaps.merge(D[strand][chrom]))
 			else:
 				D[strand][chrom] 	= utils.tree(D[strand][chrom])
+		if STRAND not in D:
+			print "user specified strand is not present in annotation file"
+			D 	= None 
 	return D
 class interval:
 	def __init__(self, start, stop, name,chrom):

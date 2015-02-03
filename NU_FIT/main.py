@@ -102,7 +102,10 @@ def run(argv):
 
 		if test:
 			print "...warning, running test"
-		regions 	= read.readIntervals(regionFile,single=single, merge=merge, interval=interval)#read in annotation intervals
+		regions 	= read.readIntervals(regionFile,strand, single=single, merge=merge, interval=interval)#read in annotation intervals
+		if regions is None:
+			print "exiting..."
+			return False
 		if verbose:
 			sys.stdout.flush()
 			print "reading in BedGraphFile      :",
@@ -139,18 +142,18 @@ def run(argv):
 				print "exiting..."
 				return False
 			else:
-				DIR=D["-i"[0]]
-		if D["-j"] is None:
-			print "-j command not found, need to specify an output file name (path)"
+				DIR=D["-i"][0]
+		if D["-o"] is None:
+			print "-o command not found, need to specify an output file name (path)"
 			print "exiting"
 			return False
 		else:
-			if len(D["-j"]) != 1:
+			if len(D["-o"]) != 1:
 				print "-j command found but not the write number of parameters..."
 				print "exiting..."
 				return False
 			else:
-				OUT=D["-j"[0]]
+				OUT=D["-o"][0]
 		read.readDirIE_OUT(DIR, OUT)
 
 
