@@ -75,10 +75,17 @@ def insertBedGraphFile(bgFile, D,strand,test=False, spec=None):
 
 def readDirIE_OUT(DIR, out):
 	FHW 	= open(out, "w")
+	h 		= True
 	for f in os.listdir(DIR):
 		FH 	= open(DIR+f)
+		header 	= True
 		for line in FH:
-			FHW.write(line)
+			if not header:
+				FHW.write(line)
+			elif h:
+				FHW.write(line)
+				h 	= False
+			header=False	
 		FH.close()
 	FHW.close()
 

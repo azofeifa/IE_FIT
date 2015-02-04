@@ -52,9 +52,9 @@ class normal:
 	def pdf(self, x):
 		return (self.w / (self.sigma*m.sqrt(2*m.pi)))*m.exp(-m.pow(x-self.mu,2)/(2*self.sigma**2))
 class NU:
-	def __init__(self, k=1, ct=0.01, 
-		mt=20, rt = 1, bic=False,
-		hist=500,m=0, kappa=0,alpha=-2,beta=0, BIC_PEN=10, maxBIC=3, split =False ):
+	def __init__(self, k=1, ct=0.0001, 
+		mt=100, rt = 1, bic=False,
+		hist=500,m=0, kappa=0,alpha=-2,beta=0, BIC_PEN=10, maxBIC=3, split =False,gibbs=False ):
 		self.k			= k
 		self.rvs 		= None
 		self.ct 		= ct
@@ -75,7 +75,7 @@ class NU:
 		self.kappa 		= kappa #for mu
 		self.alpha 		= alpha #for sigma
 		self.beta 		= beta #for sigma
-
+		self.gibbs 		= gibbs
 
 
 
@@ -107,7 +107,7 @@ class NU:
 		if rev:
 			rvs+= [uniform(minX, IS[i],w=initW) for i in range(0, K)] 	
 		else:
-			rvs+= [uniform(IS[i], maxX,w=initW) for i in range(0, K)] 
+			rvs+= [uniform(IS[i], maxX,w=initW) if i == 0 else uniform(IS[i], np.random.uniform(IS[i], maxX),w=initW)  for i in range(0, K)] 
 		w 	= np.zeros((X.shape[0],K*2))
 		prevLL 	= -np.Inf
 		while not converged and t< self.mt:
@@ -134,18 +134,22 @@ class NU:
 
 			LL 		= sum([LOG(sum([rv.pdf(x) for rv in rvs]))*y for x,y in zip(X,Y)])
 			if self.split:
+				#============
+				# instead of searching through all Ls make it gready...
 				# #pick new Ls, run accross data pick best split based on max loglikelihood
 				uniforms 	= [rv for rv in rvs if rv.type == "uniform"]
 				prevBs 		= [rv.b for rv in rvs if rv.type == "uniform"]
 				maxUniL 	= LL
 				argU 		= None
 				for u in uniforms:
-					for l in np.linspace(u.a, maxX, 20):
-						u.b 	= l
-						ull 	= sum([LOG(sum([rv.pdf(x) for rv in rvs]))*y for x,y in zip(X,Y)])
-						if ull > maxUniL:
-							maxUniL = ull
-							argU 	= [rv.b for rv in rvs if rv.type == "uniform"]
+					if u.b != maxX:
+						trys 	= np.linspace(u.b-10, u.b+10,5)
+						for l in trys:
+							u.b 	= l
+							ull 	= sum([LOG(sum([rv.pdf(x) for rv in rvs]))*y for x,y in zip(X,Y)])
+							if ull > maxUniL:
+								maxUniL = ull
+								argU 	= [rv.b for rv in rvs if rv.type == "uniform"]
 				if argU:
 					for i, argl in enumerate(argU):
 						uniforms[i].b 	= argl
@@ -155,11 +159,16 @@ class NU:
 						uniforms[i].b 	= b
 				if abs(LL - prevLL) < self.ct:
 					print "converged"
-			
 					return prevLL, rvs,True
 			prevLL 	= LL	
 			t+=1
 		return prevLL, rvs,converged
+	def _estimate_gibbs(self,X,Y,k,rev=False):
+		ll 			= -np.Inf
+		rvs 		= list()
+		converged 	= False
+
+		return ll,rvs, converged
 		
 
 
@@ -177,7 +186,10 @@ class NU:
 				k 							= self.k
 				maxLL, maxRVs,maxC 	= -np.Inf, None,False
 				for t in range(0, self.rt):
-					LL, rvs,converged 	= self._estimate(X, Y, k,rev=rev)
+					if not self.gibbs:
+						LL, rvs,converged 	= self._estimate(X, Y, k,rev=rev)
+					else:
+						LL,rvs, converged 	= self._estimate_gibbs(X,Y,k,rev=rev)
 
 					if maxLL < LL or maxLL == -np.Inf:
 						maxLL 	= LL
@@ -189,7 +201,11 @@ class NU:
 				for k in range(0, self.maxBIC):
 					maxLL, maxRVs,maxC 	= -np.Inf, None,False
 					for t in range(0, self.rt):
-						LL, rvs,converged 	= self._estimate(X, Y, k,rev=rev)
+						if not self.gibbs:
+							LL, rvs,converged 	= self._estimate(X, Y, k,rev=rev)
+						else:
+							LL,rvs, converged 	= self._estimate_gibbs(X,Y,k,rev=rev)
+
 						if maxLL < LL or maxRVs is None:
 							maxLL 	= LL
 							maxRVs 	= rvs 
@@ -216,6 +232,8 @@ class NU:
 			X 				= (edges[1:] + edges[:-1]) / 2.
 			Y 				= counts
 			xs 				= np.linspace(min(X)-10, max(X)+10, 1000)
+			for rv in self.rvs:
+				print rv
 			plt.bar(X,Y,alpha=0.5,width=(max(X) - min(X)) / len(X))
 			p1, 	= plt.plot(xs, map(lambda x: sum([rv.pdf(x) for rv in self.rvs ]),  xs), linewidth=2.5, linestyle = "--", color='green')
 			plt.show()
@@ -229,8 +247,14 @@ class NU:
 	def _func(self, x):
 		return sum([rv.pdf(x) for rv in self.rvs])
 
+D 	 = [i for i in np.random.normal(0,1,1000)] + [i for i in np.random.uniform(0,100,1000)]
+D 	+= [i for i in np.random.normal(20,1,500)] + [i for i in np.random.uniform(20,75,1000)]
 
-
+Y,X = np.histogram(D, bins=1000)
+X 	= (X[:-1] + X[1:])/2.
+clf = NU(hist=1000,gibbs=False, k=2, split=True)
+clf.fit(X, weights=Y)
+clf.display(D)
 
 
 
