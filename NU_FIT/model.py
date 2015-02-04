@@ -246,15 +246,15 @@ class NU:
 		
 	def _func(self, x):
 		return sum([rv.pdf(x) for rv in self.rvs])
+if __name__ == "__main__":
+	D 	 = [i for i in np.random.normal(0,1,1000)] + [i for i in np.random.uniform(0,100,1000)]
+	D 	+= [i for i in np.random.normal(20,1,500)] + [i for i in np.random.uniform(20,75,1000)]
 
-D 	 = [i for i in np.random.normal(0,1,1000)] + [i for i in np.random.uniform(0,100,1000)]
-D 	+= [i for i in np.random.normal(20,1,500)] + [i for i in np.random.uniform(20,75,1000)]
-
-Y,X = np.histogram(D, bins=1000)
-X 	= (X[:-1] + X[1:])/2.
-clf = NU(hist=1000,gibbs=False, k=2, split=True)
-clf.fit(X, weights=Y)
-clf.display(D)
+	Y,X = np.histogram(D, bins=1000)
+	X 	= (X[:-1] + X[1:])/2.
+	clf = NU(hist=1000,gibbs=False, k=2, split=True)
+	clf.fit(X, weights=Y)
+	clf.display(D)
 
 
 
